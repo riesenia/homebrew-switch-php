@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# List of allowed PHP versions
+PHP_VERSIONS=("php@7.4" "php@8.1" "php@8.3")
+
+# Check if a version argument is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 {7.4|8.1|8.3}"
+    exit 1
+fi
+
+# Extract version from the first argument
+PHP_VERSION_NUMBER="$1"
+PHP_VERSION="php@$PHP_VERSION_NUMBER"
+
+# Check if the provided version is in the allowed list
+if [[ ! " ${PHP_VERSIONS[@]} " =~ " $PHP_VERSION " ]]; then
+    echo "Invalid PHP version. Please use 7.4, 8.1, or 8.3."
+    exit 1
+fi
+
+# Loop through the PHP versions and unlink them except the selected version
+for VERSION in "${PHP_VERSIONS[@]}"; do
+    if [[ "$VERSION" != "$PHP_VERSION" ]]; then
+        echo "Unlinking $VERSION..."
+        brew unlink "$VERSION"
+    fi
+done
+
+# Link the specified PHP version forcefully
+echo "Linking $PHP_VERSION..."
+brew link "$PHP_VERSION" --force --overwrite
+
+# Update Apache configuration to use the specified PHP version
+sed -ie '/LoadModule php/ s/^#*/#/' /opt/homebrew/etc/httpd/httpd.conf
+
+if [ "$PHP_VERSION_NUMBER" == "7.4" ]; then
+    sed -ie '/LoadModule php7_module .*7\.4/ s/^#*//' /opt/homebrew/etc/httpd/httpd.conf
+else
+    sed -ie "/LoadModule php_module .*${PHP_VERSION_NUMBER//./\\.}/ s/^#*//" /opt/homebrew/etc/httpd/httpd.conf
+fi
+
+# Restart Apache service
+echo "Restarting Apache service..."
+brew services restart httpd
