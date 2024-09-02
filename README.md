@@ -8,13 +8,13 @@ Add PHP modules to the *httpd.conf* file to load the correct PHP module for each
 
 ```
 # Load PHP 7.4 Module
-LoadModule php7_module /usr/local/opt/php@7.4/lib/httpd/modules/libphp7.so
+LoadModule php7_module /opt/homebrew/opt/php@7.4//lib/httpd/modules/libphp7.so
 
 # Load PHP 8.1 Module
-LoadModule php_module /usr/local/opt/php@8.1/lib/httpd/modules/libphp.so
+LoadModule php_module /opt/homebrew/opt/php@8.1/lib/httpd/modules/libphp.so
 
 # Load PHP 8.3 Module
-LoadModule php_module /usr/local/opt/php@8.3/lib/httpd/modules/libphp.so
+LoadModule php_module /opt/homebrew/opt/php@8.3/lib/httpd/modules/libphp.so
 ```
 
 Make sure these paths match the location of the PHP modules installed by Homebrew.
