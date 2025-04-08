@@ -1,6 +1,6 @@
 # switch-php
 
-Installs and switches between different versions of PHP (7.4, 8.1, and 8.3).
+Installs and switches between different versions of PHP (7.4, 8.1, 8.3, 8.4).
 
 ## Configuration
 
@@ -15,6 +15,9 @@ LoadModule php_module /opt/homebrew/opt/php@8.1/lib/httpd/modules/libphp.so
 
 # Load PHP 8.3 Module
 LoadModule php_module /opt/homebrew/opt/php@8.3/lib/httpd/modules/libphp.so
+
+# Load PHP 8.4 Module
+LoadModule php_module /opt/homebrew/opt/php@8.4/lib/httpd/modules/libphp.so
 ```
 
 Make sure these paths match the location of the PHP modules installed by Homebrew.
@@ -25,4 +28,5 @@ Make sure these paths match the location of the PHP modules installed by Homebre
 switch-php 7.4
 switch-php 8.1
 switch-php 8.3
+switch-php 8.4
 ```
