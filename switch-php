@@ -1,10 +1,17 @@
 #!/bin/bash
 
+# Check if rprint is installed
+if ! command -v rprint &> /dev/null; then
+    echo "Error: rprint not installed. Run: brew install riesenia/utils/rprint"
+    exit 1
+fi
+
 # List of allowed PHP versions
 PHP_VERSIONS=("php@7.4" "php@8.1" "php@8.3" "php@8.4")
 
 # Check if a version argument is provided
 if [ -z "$1" ]; then
+    rprint error "No PHP version specified"
     echo "Usage: $0 {7.4|8.1|8.3|8.4}"
     exit 1
 fi
@@ -15,23 +22,25 @@ PHP_VERSION="php@$PHP_VERSION_NUMBER"
 
 # Check if the provided version is in the allowed list
 if [[ ! " ${PHP_VERSIONS[@]} " =~ " $PHP_VERSION " ]]; then
-    echo "Invalid PHP version. Please use 7.4, 8.1, 8.3, or 8.4."
+    rprint error "Invalid PHP version: $PHP_VERSION_NUMBER"
+    echo "Please use 7.4, 8.1, 8.3, or 8.4."
     exit 1
 fi
 
 # Loop through the PHP versions and unlink them except the selected version
 for VERSION in "${PHP_VERSIONS[@]}"; do
     if [[ "$VERSION" != "$PHP_VERSION" ]]; then
-        echo "Unlinking $VERSION..."
+        rprint info "Unlinking $VERSION..."
         brew unlink "$VERSION"
     fi
 done
 
 # Link the specified PHP version forcefully
-echo "Linking $PHP_VERSION..."
+rprint info "Linking $PHP_VERSION..."
 brew link "$PHP_VERSION" --force --overwrite
 
 # Update Apache configuration to use the specified PHP version
+rprint info "Updating Apache configuration..."
 sed -ie '/LoadModule php/ s/^#*/#/' /opt/homebrew/etc/httpd/httpd.conf
 
 if [ "$PHP_VERSION_NUMBER" == "7.4" ]; then
@@ -41,5 +50,7 @@ else
 fi
 
 # Restart Apache service
-echo "Restarting Apache service..."
+rprint info "Restarting Apache service..."
 brew services restart httpd
+
+rprint success "Switched to PHP $PHP_VERSION_NUMBER"
